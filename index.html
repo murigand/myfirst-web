@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K'Design | Attire Rentals & Decor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            dark: '#1a1a2e',
+                            light: '#f8f9fa',
+                            accent: '#8B0000'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        html { scroll-behavior: smooth; }
+        
+        /* Hero Backgrounds */
+        .hero-pattern { background-image: linear-gradient(rgba(26, 26, 46, 0.8), rgba(26, 26, 46, 0.8)), url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80'); background-size: cover; background-position: center; }
+        .men-hero { background-image: linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.7)), url('https://images.unsplash.com/photo-1593030761757-71fae46af504?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center; }
+        .women-hero { background-image: linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.7)), url('https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center top; }
+        .funeral-hero { background-image: linear-gradient(rgba(26, 26, 46, 0.8), rgba(26, 26, 46, 0.8)), url('https://images.unsplash.com/photo-1542458428-21d98fa671d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center; }
+        .events-hero { background-image: linear-gradient(rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.7)), url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80'); background-size: cover; background-position: center; }
+        
+        /* Product Card Interactions */
+        .card-zoom:hover img { transform: scale(1.05); }
+        .card-zoom img { transition: transform 0.5s ease; }
+        .product-card { cursor: pointer; position: relative; }
+        .product-card .overlay { opacity: 0; transition: opacity 0.3s ease; background: rgba(212, 175, 55, 0.8); }
+        .product-card:hover .overlay { opacity: 1; }
+        
+        /* Page transition styles */
+        .page-section { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .page-section.active { display: block; }
+        
+        /* Modal Styles */
+        #booking-modal { backdrop-filter: blur(5px); transition: opacity 0.3s; }
+        .modal-hidden { opacity: 0; pointer-events: none; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 bg-brand-light flex flex-col min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-40 bg-white/95 backdrop-blur-sm shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" onclick="showPage('home')" class="font-serif text-2xl font-bold text-brand-dark tracking-wider cursor-pointer">
+                        <i class="fa-solid fa-crown text-brand-gold mr-2"></i>K'<span class="font-light">DESIGN</span>
+                    </a>
+                </div>
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex space-x-6 items-center">
+                    <button onclick="showPage('home')" class="nav-link text-gray-800 hover:text-brand-gold px-2 py-2 text-sm font-medium transition active-nav">Home</button>
+                    <button onclick="showPage('men')" class="nav-link text-gray-800 hover:text-brand-gold px-2 py-2 text-sm font-medium transition">Men's (Wedding)</button>
+                    <button onclick="showPage('women')" class="nav-link text-gray-800 hover:text-brand-gold px-2 py-2 text-sm font-medium transition">Women's (Wedding)</button>
+                    <button onclick="showPage('funeral')" class="nav-link text-gray-800 hover:text-brand-gold px-2 py-2 text-sm font-medium transition">Funeral Attire</button>
+                    <button onclick="showPage('events')" class="nav-link text-gray-800 hover:text-brand-gold px-2 py-2 text-sm font-medium transition">Events & Decor</button>
+                    <button onclick="document.getElementById('contact-footer').scrollIntoView()" class="bg-brand-dark text-white hover:bg-brand-gold px-5 py-2 rounded-full text-sm font-medium transition">Contact</button>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-800 hover:text-brand-gold focus:outline-none">
+                        <i class="fa-solid fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="showPage('home')" class="mobile-nav-link w-full text-left block px-3 py-2 text-base font-medium text-brand-gold">Home</button>
+                <button onclick="showPage('men')" class="mobile-nav-link w-full text-left block px-3 py-2 text-base font-medium text-gray-800">Men's (Wedding)</button>
+                <button onclick="showPage('women')" class="mobile-nav-link w-full text-left block px-3 py-2 text-base font-medium text-gray-800">Women's (Wedding)</button>
+                <button onclick="showPage('funeral')" class="mobile-nav-link w-full text-left block px-3 py-2 text-base font-medium text-gray-800">Funeral Attire</button>
+                <button onclick="showPage('events')" class="mobile-nav-link w-full text-left block px-3 py-2 text-base font-medium text-gray-800">Events & Decor</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Area -->
+    <div class="flex-grow">
+    
+        <!-- ================= HOME PAGE ================= -->
+        <div id="page-home" class="page-section active bg-brand-dark">
+            <section class="hero-pattern min-h-screen flex items-center justify-center relative pt-20">
+                <div class="text-center px-4 sm:px-6 lg:px-8 z-10 max-w-4xl">
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-serif font-bold text-white mb-6 tracking-wide drop-shadow-lg">
+                        Elegance for Every <span class="text-brand-gold">Milestone</span>
+                    </h1>
+                    <p class="mt-4 text-lg sm:text-xl text-gray-200 mb-10 font-light max-w-2xl mx-auto drop-shadow-md">
+                        Premium attire rentals and exquisite event decoration. Specializing in Weddings, Funerals, Save the Dates, and authentic Rwandan Imikenyero.
+                    </p>
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <button onclick="showPage('men')" class="bg-brand-gold hover:bg-yellow-600 text-white font-semibold py-3 px-8 rounded-full transition shadow-lg">Men's Attire</button>
+                        <button onclick="showPage('women')" class="bg-white text-brand-dark hover:bg-gray-100 font-semibold py-3 px-8 rounded-full transition shadow-lg">Women's Attire</button>
+                        <button onclick="showPage('events')" class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-brand-dark font-semibold py-3 px-8 rounded-full transition duration-300">Decor Services</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ================= MEN'S (WEDDING) PAGE ================= -->
+        <div id="page-men" class="page-section pt-20 bg-gray-50">
+            <div class="men-hero h-64 md:h-80 flex items-center justify-center">
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white text-center drop-shadow-md">Men's Wedding Attire</h1>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Browse our collection. Click on any attire to open the booking form and send us a direct inquiry.</p>
+
+                <!-- Men Imikenyero Part -->
+                <div class="flex items-center justify-between mb-8 border-b-2 border-brand-gold pb-2">
+                    <h3 class="text-3xl font-serif text-brand-dark">Traditional Imikenyero</h3>
+                    <span class="text-sm font-semibold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full">Gusaba Collection</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <!-- Item 1 (Your Image) -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Groom Traditional Imikenyero (Gold/Cream)', 'https://i1-e.pinimg.com/1200x/55/2a/1a/552a1a3c5d350a6d79ec661572205163.jpg')">
+                        <div class="relative h-80">
+                            <img src="https://i1-e.pinimg.com/1200x/55/2a/1a/552a1a3c5d350a6d79ec661572205163.jpg" class="w-full h-full object-cover object-top" alt="Men Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        
+                        <div class="p-4 text-center">
+                            <h4 class="font-serif font-bold text-gray-800">Premium Groom Imikenyero</h4>
+                        </div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Entourage Group Imikenyero Set', 'https://images.unsplash.com/photo-1583515865682-140733d3c1de?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://www.pinterest.com/pin/1548181159057579/" class="w-full h-full object-cover" alt="Groomsmen Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h4 class="font-serif font-bold text-gray-800">Groomsmen Collection</h4>
+                        </div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Classic White/Gold Imikenyero', 'https://images.unsplash.com/photo-1605289982774-9a6fef564df8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://images.unsplash.com/photo-1605289982774-9a6fef564df8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Traditional Attire">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h4 class="font-serif font-bold text-gray-800">Classic White & Gold</h4>
+                        </div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Elders/Parents Traditional Drape', 'https://images.unsplash.com/photo-1523450001312-faa4e2e37f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://images.unsplash.com/photo-1523450001312-faa4e2e37f0f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Traditional Attire">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center">
+                            <h4 class="font-serif font-bold text-gray-800">Parents/Elders Drape</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Men Suits Part -->
+                <div class="flex items-center justify-between mb-8 border-b-2 border-brand-gold pb-2 mt-8">
+                    <h3 class="text-3xl font-serif text-brand-dark">Wedding Suits Catalog</h3>
+                    <span class="text-sm font-semibold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full">All Colors & Fits</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Suit 1 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Navy Blue Tailored Suit', 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Navy Suit">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Classic Navy Blue</h4></div>
+                    </div>
+                    <!-- Suit 2 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Premium Black Tuxedo', 'https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Tuxedo">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Premium Black Tuxedo</h4></div>
+                    </div>
+                    <!-- Suit 3 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Burgundy/Maroon Statement Suit', 'https://images.unsplash.com/photo-1626497764746-6dc36addf50e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1626497764746-6dc36addf50e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Burgundy Suit">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Burgundy Statement</h4></div>
+                    </div>
+                    <!-- Suit 4 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Emerald Green Suit', 'https://images.unsplash.com/photo-1505022610485-0249ba5b3675?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1505022610485-0249ba5b3675?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Green Suit">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Emerald Green</h4></div>
+                    </div>
+                    <!-- Suit 5 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Beige/Tan Summer Suit', 'https://images.unsplash.com/photo-1593030761757-71fae46af504?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1593030761757-71fae46af504?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Beige Suit">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Beige/Tan Summer</h4></div>
+                    </div>
+                    <!-- Suit 6 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Light Grey 3-Piece Suit', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Grey Suit">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Light Grey 3-Piece</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= WOMEN'S (WEDDING) PAGE ================= -->
+        <div id="page-women" class="page-section pt-20 bg-gray-50">
+             <div class="women-hero h-64 md:h-80 flex items-center justify-center">
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white text-center drop-shadow-md">Women's Wedding Attire</h1>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Discover elegance. Click on any dress or traditional wear to easily send us your booking details.</p>
+
+                <!-- Women Imikenyero Part -->
+                <div class="flex items-center justify-between mb-8 border-b-2 border-brand-gold pb-2">
+                    <h3 class="text-3xl font-serif text-brand-dark">Traditional Imikenyero</h3>
+                    <span class="text-sm font-semibold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full">Gusaba Collection</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <!-- Item 1 (Your image) -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Bridal Imikenyero (Elegant White/Gold)', 'https://i.pinimg.com/736x/eb/60/6c/eb606c32b187d41c6f4077467396f77f.jpg')">
+                        <div class="relative h-80">
+                            <img src="https://i.pinimg.com/736x/eb/60/6c/eb606c32b187d41c6f4077467396f77f.jpg" class="w-full h-full object-cover object-top" alt="Bridal Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-serif font-bold text-gray-800">Bridal Elegant Imikenyero</h4></div>
+                    </div>
+                    <!-- Item 2 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Bridesmaid Matching Set', 'https://images.unsplash.com/photo-1520697920409-5264b38210eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://images.unsplash.com/photo-1520697920409-5264b38210eb?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Guest Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-serif font-bold text-gray-800">Bridesmaid Matching Set</h4></div>
+                    </div>
+                    <!-- Item 3 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Colorful Guest Imikenyero', 'https://images.unsplash.com/photo-1532054131557-013063851cb8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://images.unsplash.com/photo-1532054131557-013063851cb8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Guest Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-serif font-bold text-gray-800">Vibrant Guest Attire</h4></div>
+                    </div>
+                    <!-- Item 4 -->
+                    <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Mothers Traditional Wrap', 'https://images.unsplash.com/photo-1574880572214-cc440aeb700c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-80">
+                            <img src="https://images.unsplash.com/photo-1574880572214-cc440aeb700c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Mother Imikenyero">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full shadow-lg">Click to Book</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-serif font-bold text-gray-800">Mothers' Elegant Wrap</h4></div>
+                    </div>
+                </div>
+
+                <!-- Women Dresses Part -->
+                <div class="flex items-center justify-between mb-8 border-b-2 border-brand-gold pb-2 mt-8">
+                    <h3 class="text-3xl font-serif text-brand-dark">Wedding Dresses & Gowns</h3>
+                    <span class="text-sm font-semibold text-brand-gold bg-brand-gold/10 px-3 py-1 rounded-full">Bridal & Evening Wear</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Dress 1 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Classic White Bridal Gown', 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Wedding Dress">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Classic White Bridal Gown</h4></div>
+                    </div>
+                    <!-- Dress 2 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Mermaid Style Wedding Dress', 'https://images.unsplash.com/photo-1561053720-76cd73ff22c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1561053720-76cd73ff22c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Mermaid Dress">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Mermaid Style Gown</h4></div>
+                    </div>
+                    <!-- Dress 3 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Blush Pink Bridesmaid Dress', 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Bridesmaid Dress">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Blush Pink Bridesmaid</h4></div>
+                    </div>
+                    <!-- Dress 4 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Sage Green Evening Gown', 'https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Evening Gown">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Sage Green Evening Wear</h4></div>
+                    </div>
+                    <!-- Dress 5 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Red Reception Dress', 'https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1539008835657-9e8e9680c956?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Red Dress">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Red Reception Dress</h4></div>
+                    </div>
+                    <!-- Dress 6 -->
+                    <div class="product-card bg-white rounded-lg shadow overflow-hidden" onclick="openBookingModal('Elegant Black Evening Gown', 'https://images.unsplash.com/photo-1568252542512-9fe8cf4c8cae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-96">
+                            <img src="https://images.unsplash.com/photo-1568252542512-9fe8cf4c8cae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover object-top" alt="Black Dress">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-4 rounded-full text-sm">Book This</span></div>
+                        </div>
+                        <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Elegant Black Gown</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= FUNERAL ATTIRE PAGE ================= -->
+        <div id="page-funeral" class="page-section pt-20 bg-gray-50">
+            <div class="funeral-hero h-64 md:h-80 flex items-center justify-center">
+               <h1 class="text-4xl md:text-5xl font-serif font-bold text-white text-center drop-shadow-md">Funeral Attire</h1>
+           </div>
+           
+           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+               <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">Respectful, elegant, and appropriate dark attire for honoring loved ones.</p>
+
+               <!-- Men/Boys Funeral -->
+               <div class="mb-16">
+                    <h3 class="text-2xl font-serif text-brand-dark mb-6 border-b-2 border-gray-800 pb-2 inline-block">Men & Boys (Suits)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Men\'s Solid Black Funeral Suit', 'https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Black Suit"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Solid Black Suit</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Men\'s Charcoal Grey Suit', 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Grey Suit"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Charcoal Grey Suit</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Boys Black Suit', 'https://images.unsplash.com/photo-1518144591331-17a5dd71c477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1518144591331-17a5dd71c477?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Boys Suit"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Boys' Dark Suit</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Men\'s Dark Navy Suit', 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1594938298603-c8148c4dae35?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Navy Suit"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Dark Navy Suit</h4></div>
+                        </div>
+                    </div>
+               </div>
+
+               <!-- Women/Girls Funeral -->
+               <div>
+                    <h3 class="text-2xl font-serif text-brand-dark mb-6 border-b-2 border-gray-800 pb-2 inline-block">Women & Girls (Dresses & Imikenyero)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Women\'s Black Funeral Imikenyero', 'https://images.unsplash.com/photo-1494972308805-463bc619d34e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1494972308805-463bc619d34e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Black Dress"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Dark Imikenyero / Wrap</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Modest Black Dress', 'https://images.unsplash.com/photo-1568252542512-9fe8cf4c8cae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1568252542512-9fe8cf4c8cae?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Modest Dress"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Modest Black Dress</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Charcoal/Grey Dress', 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&sat=-100')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&sat=-100" class="w-full h-full object-cover" alt="Grey Dress"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Grey Funeral Dress</h4></div>
+                        </div>
+                        <div class="product-card bg-white rounded-xl shadow overflow-hidden group" onclick="openBookingModal('Girls Dark Attire', 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="relative h-80"><img src="https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover" alt="Girls Dress"><div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This</span></div></div>
+                            <div class="p-4 text-center"><h4 class="font-bold text-gray-800">Girls' Dark Attire</h4></div>
+                        </div>
+                    </div>
+               </div>
+           </div>
+       </div>
+
+        <!-- ================= EVENTS & DECOR PAGE ================= -->
+        <div id="page-events" class="page-section pt-20 bg-gray-50">
+             <div class="events-hero h-64 md:h-80 flex items-center justify-center">
+                <h1 class="text-4xl md:text-5xl font-serif font-bold text-white text-center drop-shadow-md">Decoration Services Catalog</h1>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <p class="text-center text-gray-600 text-lg mb-12 max-w-2xl mx-auto">From joyous celebrations to solemn gatherings, K'Design transforms your spaces. Browse our gallery and click any setup to inquire.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Wedding Decor -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('Wedding Ceremony & Reception Decor', 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wedding Decor" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">Wedding & Gusaba</h4></div>
+                    </div>
+
+                    <!-- Funeral Decor -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('Funeral & Memorial Service Setup', 'https://images.unsplash.com/photo-1542458428-21d98fa671d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1542458428-21d98fa671d1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Funeral Setup" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">Funerals & Memorials</h4></div>
+                    </div>
+
+                    <!-- Save the Date -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('Save the Date Photoshoot Decor', 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Save the Date" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">Save the Date</h4></div>
+                    </div>
+
+                    <!-- Bridal Shower -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('Bridal Shower / Bachelorette Setup', 'https://images.unsplash.com/photo-1518228965709-66c39bb79cd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1518228965709-66c39bb79cd8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bridal Shower" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">Bridal Shower</h4></div>
+                    </div>
+
+                    <!-- Proposing -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('Romantic Marriage Proposal Setup', 'https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Proposing" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">Proposing Setup</h4></div>
+                    </div>
+
+                    <!-- General Party/Banquet -->
+                    <div class="product-card bg-white rounded-xl shadow-md overflow-hidden" onclick="openBookingModal('General Event & Banquet Decor', 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="relative h-64">
+                            <img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Banquet Setup" class="w-full h-full object-cover">
+                            <div class="overlay absolute inset-0 flex items-center justify-center"><span class="bg-white text-brand-dark font-bold py-2 px-6 rounded-full">Book This Setup</span></div>
+                        </div>
+                        <div class="p-6 text-center"><h4 class="text-xl font-serif font-bold text-brand-dark">General Banquets</h4></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End Flex Grow Area -->
+
+    <!-- Dynamic Booking Modal -->
+    <div id="booking-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 modal-hidden">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto m-4 flex flex-col md:flex-row relative">
+            
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-500 hover:text-brand-accent z-10 bg-white rounded-full p-2 w-10 h-10 flex items-center justify-center shadow">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <!-- Image Side -->
+            <div class="w-full md:w-1/2 bg-gray-100">
+                <img id="modal-img" src="" alt="Selected Product" class="w-full h-64 md:h-full object-cover object-center">
+            </div>
+
+            <!-- Form Side -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
+                <h2 class="text-sm font-bold text-brand-gold uppercase tracking-widest mb-1">Inquire About</h2>
+                <h3 id="modal-title" class="text-2xl font-serif text-brand-dark mb-6">Product Title</h3>
+                
+                <form id="directEmailForm" action="https://api.web3forms.com/submit" method="POST">
+                    
+                    <!-- Replace with your Access Key -->
+                    <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+                    
+                    <!-- Subject of the email -->
+                    <input type="hidden" name="subject" id="form-subject" value="New Booking Inquiry from K'Design Website">
+                    
+                    <!-- Honey pot to prevent spam -->
+                    <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
+
+                    <!-- Hidden fields to pass product info -->
+                    <input type="hidden" name="Product_Requested" id="b-product-title">
+                    <input type="hidden" name="Product_Image_Reference" id="b-product-img">
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                            <input type="text" name="Client_Name" id="b-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-gold focus:border-brand-gold outline-none" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <input type="text" name="Client_Phone" id="b-phone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-gold focus:border-brand-gold outline-none" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">I want to:</label>
+                                <select name="Request_Type" id="b-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-gold outline-none">
+                                    <option value="Rent">Rent</option>
+                                    <option value="Buy">Buy</option>
+                                    <option value="Decorate">Decorate Space</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
+                                <input type="date" name="Event_Date" id="b-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-gold outline-none" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Additional Details</label>
+                            <textarea name="Additional_Message" id="b-msg" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-brand-gold outline-none" placeholder="Sizes, colors, or specific requests..."></textarea>
+                        </div>
+                        
+                        <!-- Redirect URL after successful submission -->
+                        <input type="hidden" name="redirect" value="https://web3forms.com/success">
+
+                        <button type="submit" class="w-full bg-brand-gold hover:bg-yellow-600 text-white font-bold py-3 px-4 rounded-lg transition duration-300 shadow-md flex justify-center items-center">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Send Inquiry
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Footer Section -->
+    <section id="contact-footer" class="py-12 bg-brand-dark text-white mt-auto border-t-4 border-brand-gold">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center text-center md:text-left gap-6">
+                <div>
+                    <h3 class="text-2xl font-serif font-bold mb-2">
+                        <i class="fa-solid fa-crown text-brand-gold mr-2"></i>K'DESIGN
+                    </h3>
+                    <p class="text-gray-400 text-sm">Attire Rentals & Premium Events</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6 md:gap-12 text-sm">
+                    <div class="flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-location-dot text-brand-gold text-xl w-8"></i>
+                        <span>Kigali City Market<br>Rwanda</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-phone text-brand-gold text-xl w-8"></i>
+                        <span>0788269607</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-envelope text-brand-gold text-xl w-8"></i>
+                        <span>murigandejosephwilson@gmail.com</span>
+                    </div>
+                    <div class="flex items-center justify-center md:justify-start">
+                        <i class="fa-solid fa-clock text-brand-gold text-xl w-8"></i>
+                        <span>Mon-Sat: 8:00 AM - 7:00 PM<br>Sun: By Appointment</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Single Page Application (SPA) Logic
+        function showPage(pageId) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-section');
+            pages.forEach(page => page.classList.remove('active'));
+
+            // Show selected page
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) targetPage.classList.add('active');
+
+            // Update desktop nav styling
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('text-brand-gold', 'active-nav');
+                link.classList.add('text-gray-800');
+            });
+            
+            // Highlight active link safely
+            const linkMap = {
+                'home': 'Home', 'men': "Men's (Wedding)", 'women': "Women's (Wedding)", 
+                'funeral': 'Funeral', 'events': 'Events'
+            };
+            
+            const activeLink = Array.from(navLinks).find(link => link.textContent.includes(linkMap[pageId]));
+            if (activeLink) {
+                activeLink.classList.remove('text-gray-800');
+                activeLink.classList.add('text-brand-gold', 'active-nav');
+            }
+
+            // Update mobile nav
+            const mobileLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileLinks.forEach(link => {
+                link.classList.remove('text-brand-gold');
+                link.classList.add('text-gray-800');
+            });
+            const activeMobileLink = Array.from(mobileLinks).find(link => link.textContent.includes(linkMap[pageId]));
+            if (activeMobileLink) {
+                activeMobileLink.classList.remove('text-gray-800');
+                activeMobileLink.classList.add('text-brand-gold');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md', 'bg-white');
+                navbar.classList.remove('bg-white/95');
+            } else {
+                navbar.classList.remove('shadow-md', 'bg-white');
+                navbar.classList.add('bg-white/95');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // --- BOOKING MODAL & EMAIL LOGIC ---
+        
+        const modal = document.getElementById('booking-modal');
+        const modalImg = document.getElementById('modal-img');
+        const modalTitle = document.getElementById('modal-title');
+        const hiddenProductTitle = document.getElementById('b-product-title');
+        const hiddenProductImg = document.getElementById('b-product-img');
+        const formSubject = document.getElementById('form-subject');
+        
+        // Open Modal and populate data
+        function openBookingModal(title, imgUrl) {
+            modalTitle.innerText = title;
+            modalImg.src = imgUrl;
+            
+            // Populate hidden fields for the email form
+            hiddenProductTitle.value = title;
+            hiddenProductImg.value = imgUrl;
+            formSubject.value = `New Inquiry: ${title}`;
+
+            modal.classList.remove('modal-hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        // Close Modal
+        function closeModal() {
+            modal.classList.add('modal-hidden');
+            document.body.style.overflow = 'auto';
+            document.getElementById('directEmailForm').reset();
+        }
+
+        // Initialize page
+        window.onload = () => showPage('home');
+    </script>
+</body>
+</html>
